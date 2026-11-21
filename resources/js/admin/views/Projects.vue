@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue';
-import { get, post, patch, del, toFormData } from '../api';
+import { get, post, patch, del, toFormData, failMessage } from '../api';
 import { toast } from '../../lib/toast';
 import Drawer from '../Drawer.vue';
 import ConfirmButton from '../ConfirmButton.vue';
@@ -50,7 +50,7 @@ async function save() {
     if (e.cover && !coverFile.value) body.cover_from_gallery = e.cover;
     const res = await post(e.id ? `/projects/${e.slug_original || e.slug}` : '/projects', toFormData(body, { images: newImages.value, cover_file: coverFile.value }));
     saving.value = false;
-    if (!res.ok) { Object.assign(errors, res.errors); toast(res.message && !Object.keys(res.errors).length ? res.message : 'Vérifiez les champs signalés.', 'fa-triangle-exclamation'); return; }
+    if (!res.ok) { Object.assign(errors, res.errors); toast(failMessage(res), 'fa-triangle-exclamation'); return; }
     toast(e.id ? 'Projet enregistré.' : 'Projet créé.');
     await load();
     edit(projects.value.find((p) => p.id === res.data.id));

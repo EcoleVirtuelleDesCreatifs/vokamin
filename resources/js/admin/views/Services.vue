@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
-import { get, post, toFormData } from '../api';
+import { get, post, toFormData, failMessage } from '../api';
 import { toast } from '../../lib/toast';
 import Drawer from '../Drawer.vue';
 import ListEditor from '../ListEditor.vue';
@@ -26,7 +26,7 @@ async function save() {
     const body = { name: e.name, short: e.short, icon: e.icon, teaser: e.teaser, intro: e.intro, intro2: e.intro2 || '', prestations: e.prestations, beneficiaires: e.beneficiaires, methode: e.methode, avantages: e.avantages, is_published: e.is_published, position: e.position };
     const res = await post(`/services/${e.slug}`, toFormData(body, files));
     saving.value = false;
-    if (!res.ok) { Object.assign(errors, res.errors); toast('Vérifiez les champs signalés.', 'fa-triangle-exclamation'); return; }
+    if (!res.ok) { Object.assign(errors, res.errors); toast(failMessage(res), 'fa-triangle-exclamation'); return; }
     const i = services.value.findIndex((s) => s.id === res.data.id);
     services.value[i] = res.data;
     toast('Service enregistré.');
@@ -65,6 +65,7 @@ async function save() {
                     <img :src="url" alt="" class="w-100 mb-2" style="aspect-ratio:4/3;object-fit:cover">
                     <label class="small fw-bold d-block mb-1">{{ label }}</label>
                     <input class="form-control form-control-sm" type="file" accept=".jpg,.jpeg,.png,.webp" @change="files[key] = $event.target.files[0]">
+                    <p v-if="errors[key]" class="field-error">{{ errors[key] }}</p>
                 </div>
             </div></div>
             <button class="btn-vk" type="submit" :disabled="saving"><span v-if="saving" class="spinner"></span> Enregistrer</button>

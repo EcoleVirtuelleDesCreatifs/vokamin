@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
-import { get, post, del, toFormData } from '../api';
+import { get, post, del, toFormData, failMessage } from '../api';
 import { toast } from '../../lib/toast';
 import Drawer from '../Drawer.vue';
 import ConfirmButton from '../ConfirmButton.vue';
@@ -20,7 +20,7 @@ function edit(r) {
 async function save() {
     const e = editing.value;
     const res = await post(e.id ? `/references/${e.id}` : '/references', toFormData({ name: e.name, sector: e.sector, prestation: e.prestation, project_id: e.project_id || '', logo_authorized: e.logo_authorized, is_published: e.is_published }, { logo_file: logo.value }));
-    if (!res.ok) { Object.assign(errors, res.errors); toast('Vérifiez les champs signalés.', 'fa-triangle-exclamation'); return; }
+    if (!res.ok) { Object.assign(errors, res.errors); toast(failMessage(res), 'fa-triangle-exclamation'); return; }
     toast('Référence enregistrée.'); editing.value = null; load();
 }
 async function destroy() { const res = await del(`/references/${editing.value.id}`); if (res.ok) { editing.value = null; toast('Référence supprimée.'); load(); } }
@@ -40,7 +40,7 @@ async function destroy() { const res = await del(`/references/${editing.value.id
             <div class="col-md-6"><label class="form-label" for="r-sector">Secteur *</label><input id="r-sector" v-model="editing.sector" class="form-control" :class="{ 'is-invalid': errors.sector }"><p v-if="errors.sector" class="field-error">{{ errors.sector }}</p></div>
             <div class="col-12"><label class="form-label" for="r-presta">Prestation réalisée *</label><input id="r-presta" v-model="editing.prestation" class="form-control" :class="{ 'is-invalid': errors.prestation }"><p v-if="errors.prestation" class="field-error">{{ errors.prestation }}</p></div>
             <div class="col-md-6"><label class="form-label" for="r-proj">Projet associé</label><select id="r-proj" v-model="editing.project_id" class="form-select"><option value="">Aucun</option><option v-for="p in projects" :key="p.id" :value="p.id">{{ p.name }}</option></select></div>
-            <div class="col-md-6"><label class="form-label" for="r-logo">Logo</label><img v-if="editing.logo_url" :src="editing.logo_url" alt="" style="max-height:48px" class="d-block mb-2"><input id="r-logo" class="form-control form-control-sm" type="file" accept=".jpg,.jpeg,.png,.webp" @change="logo = $event.target.files[0]"></div>
+            <div class="col-md-6"><label class="form-label" for="r-logo">Logo</label><img v-if="editing.logo_url" :src="editing.logo_url" alt="" style="max-height:48px" class="d-block mb-2"><input id="r-logo" class="form-control form-control-sm" type="file" accept=".jpg,.jpeg,.png,.webp" @change="logo = $event.target.files[0]"><p v-if="errors.logo_file" class="field-error">{{ errors.logo_file }}</p></div>
             <div class="col-12 d-flex gap-4"><div class="form-check form-switch"><input id="r-auth" v-model="editing.logo_authorized" class="form-check-input" type="checkbox"><label class="form-check-label" for="r-auth">Logo autorisé par le client</label></div><div class="form-check form-switch"><input id="r-pub" v-model="editing.is_published" class="form-check-input" type="checkbox"><label class="form-check-label" for="r-pub">Afficher</label></div></div>
         </div>
         <div class="d-flex flex-wrap gap-2 justify-content-between mt-4"><button class="btn-vk" type="submit">Enregistrer</button><ConfirmButton v-if="editing.id" @confirm="destroy" /></div></form>

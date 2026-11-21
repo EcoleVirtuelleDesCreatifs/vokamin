@@ -22,6 +22,7 @@ export async function send(url, body, method = 'POST') {
             return { ok: false, data, errors, message: data.message };
         }
         if (res.status === 419) return { ok: false, errors: {}, message: 'Votre session a expiré. Rechargez la page puis réessayez.' };
+        if (res.status === 413) return { ok: false, errors: {}, message: 'Fichier trop lourd pour le serveur. Réduisez la taille de l\'image puis réessayez.' };
         if (res.status === 429) return { ok: false, errors: {}, message: 'Trop de tentatives. Patientez une minute puis réessayez.' };
         if (res.status === 401) { window.location.reload(); return { ok: false, errors: {} }; }
         return { ok: false, errors: {}, message: data?.message || 'Une erreur est survenue. Réessayez dans un instant.' };

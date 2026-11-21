@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
-import { get, post, del, toFormData } from '../api';
+import { get, post, del, toFormData, failMessage } from '../api';
 import { toast } from '../../lib/toast';
 import Drawer from '../Drawer.vue';
 import ListEditor from '../ListEditor.vue';
@@ -19,7 +19,7 @@ function edit(j) {
 async function save() {
     const e = editing.value;
     const res = await post(e.id ? `/jobs/${e.id}` : '/jobs', toFormData({ title: e.title, contract: e.contract, location: e.location, experience: e.experience, missions: e.missions.filter(Boolean), is_published: e.is_published }));
-    if (!res.ok) { Object.assign(errors, res.errors); toast('Vérifiez les champs signalés.', 'fa-triangle-exclamation'); return; }
+    if (!res.ok) { Object.assign(errors, res.errors); toast(failMessage(res), 'fa-triangle-exclamation'); return; }
     toast('Offre enregistrée.'); editing.value = null; load();
 }
 async function destroy() { const res = await del(`/jobs/${editing.value.id}`); if (res.ok) { editing.value = null; toast('Offre supprimée.'); load(); } }

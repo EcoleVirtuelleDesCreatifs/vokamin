@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
-import { get, post, toFormData } from '../api';
+import { get, post, toFormData, failMessage } from '../api';
 import { toast } from '../../lib/toast';
 
 const s = ref(null);
@@ -21,7 +21,7 @@ async function save() {
     Object.keys(errors).forEach((k) => delete errors[k]);
     const keys = groups.flatMap(([, f]) => f.map(([k]) => k));
     const res = await post('/settings', toFormData(Object.fromEntries(keys.map((k) => [k, s.value[k] ?? ''])), { brochure_file: brochure.value }));
-    if (!res.ok) { Object.assign(errors, res.errors); toast('Vérifiez les champs signalés.', 'fa-triangle-exclamation'); return; }
+    if (!res.ok) { Object.assign(errors, res.errors); toast(failMessage(res), 'fa-triangle-exclamation'); return; }
     s.value = res.data; brochure.value = null;
     toast('Paramètres enregistrés : le site est à jour.');
 }

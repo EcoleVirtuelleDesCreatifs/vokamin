@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
-import { get, post, del, toFormData, fmtDate } from '../api';
+import { get, post, del, toFormData, fmtDate, failMessage } from '../api';
 import { toast } from '../../lib/toast';
 import Drawer from '../Drawer.vue';
 import ConfirmButton from '../ConfirmButton.vue';
@@ -25,7 +25,7 @@ async function save() {
     const e = editing.value;
     const res = await post(e.id ? `/posts/${e.slug}` : '/posts', toFormData({ title: e.title, category: e.category, excerpt: e.excerpt, body: e.body, published_at: e.published_at, is_published: e.is_published }, { image_file: image.value }));
     saving.value = false;
-    if (!res.ok) { Object.assign(errors, res.errors); toast('Vérifiez les champs signalés.', 'fa-triangle-exclamation'); return; }
+    if (!res.ok) { Object.assign(errors, res.errors); toast(failMessage(res), 'fa-triangle-exclamation'); return; }
     toast(e.id ? 'Article enregistré.' : 'Article publié.');
     editing.value = null;
     load();
@@ -56,7 +56,7 @@ async function destroy() {
             <div class="col-12"><label class="form-label" for="n-exc">Résumé *</label><textarea id="n-exc" v-model="editing.excerpt" class="form-control" style="min-height:70px" :class="{ 'is-invalid': errors.excerpt }"></textarea><p v-if="errors.excerpt" class="field-error">{{ errors.excerpt }}</p></div>
             <div class="col-12"><label class="form-label" for="n-body">Contenu *</label><textarea id="n-body" v-model="editing.body" class="form-control" style="min-height:300px" :class="{ 'is-invalid': errors.body }"></textarea>
                 <p class="small text-muted-vk mt-1 mb-0">Séparez les paragraphes par une ligne vide. « ## Titre » crée un intertitre, « &gt; Texte » une citation, « - élément » une liste.</p><p v-if="errors.body" class="field-error">{{ errors.body }}</p></div>
-            <div class="col-md-6"><label class="form-label" for="n-img">Image</label><img v-if="editing.image_url" :src="editing.image_url" alt="" class="w-100 mb-2" style="aspect-ratio:3/2;object-fit:cover"><input id="n-img" class="form-control form-control-sm" type="file" accept=".jpg,.jpeg,.png,.webp" @change="image = $event.target.files[0]"></div>
+            <div class="col-md-6"><label class="form-label" for="n-img">Image</label><img v-if="editing.image_url" :src="editing.image_url" alt="" class="w-100 mb-2" style="aspect-ratio:3/2;object-fit:cover"><input id="n-img" class="form-control form-control-sm" type="file" accept=".jpg,.jpeg,.png,.webp" @change="image = $event.target.files[0]"><p v-if="errors.image_file" class="field-error">{{ errors.image_file }}</p></div>
         </div>
         <div class="d-flex flex-wrap gap-2 justify-content-between mt-4"><button class="btn-vk" type="submit" :disabled="saving"><span v-if="saving" class="spinner"></span> Enregistrer</button><ConfirmButton v-if="editing.id" @confirm="destroy" /></div>
         </form>

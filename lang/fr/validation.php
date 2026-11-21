@@ -10,7 +10,7 @@ return [
     'in' => 'La valeur de :attribute est invalide.',
     'integer' => 'Le champ :attribute doit être un nombre entier.',
     'max' => [
-        'array' => '5 fichiers maximum.',
+        'array' => ':max fichiers maximum.',
         'file' => 'Le fichier dépasse la taille autorisée (:max Ko). Compressez-le puis réessayez.',
         'numeric' => 'Le champ :attribute ne doit pas dépasser :max.',
         'string' => 'Le champ :attribute ne doit pas dépasser :max caractères.',
@@ -28,6 +28,7 @@ return [
     'current_password' => 'Le mot de passe actuel est incorrect.',
     'url' => 'Le champ :attribute doit être une adresse web valide.',
     'date' => 'Le champ :attribute doit être une date valide.',
+    'uploaded' => "Le fichier :attribute n'a pas pu être envoyé : il dépasse probablement la limite du serveur. Réduisez sa taille puis réessayez.",
     'prohibited' => 'Le champ :attribute doit être vide.',
 
     'attributes' => [
@@ -36,5 +37,7 @@ return [
         'email' => 'email', 'sujet' => 'sujet', 'message' => 'message', 'poste' => 'poste', 'cv' => 'CV', 'files.*' => 'pièce jointe',
         'name' => 'nom', 'title' => 'titre', 'password' => 'mot de passe', 'location' => 'localisation', 'category' => 'catégorie',
         'images.*' => 'image', 'excerpt' => 'résumé', 'body' => 'contenu',
+        'image_file' => 'image', 'image2_file' => 'image secondaire', 'hero_file' => 'bandeau', 'cover_file' => 'image de couverture',
+        'logo_file' => 'logo', 'brochure_file' => 'plaquette',
     ],
 ];
