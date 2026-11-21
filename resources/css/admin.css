@@ -1,0 +1,26 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+@import './site.css';
+@import './admin-ui.css';
+
+/* Compléments administration */
+.adm-main { min-height: 100svh; }
+.adm-editor { background: #fff; border: 1px solid var(--vk-line); padding: 1.6rem; }
+.adm-editor .form-vk .form-label { margin-top: .2rem; }
+.adm-thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.adm-thumb { border: 1px solid var(--vk-line); background: #fff; position: relative; }
+.adm-thumb img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
+.adm-thumb input { border: 0; border-top: 1px solid var(--vk-line); width: 100%; font-size: .78rem; padding: .4rem .5rem; }
+.adm-thumb .actions { position: absolute; top: 6px; right: 6px; display: flex; gap: 4px; }
+.adm-thumb .actions button { width: 28px; height: 28px; border: 0; border-radius: 50%; background: rgba(255,255,255,.92); font-size: .75rem; }
+.adm-thumb.is-cover { outline: 2px solid var(--vk-green); }
+.adm-list-row { display: grid; grid-template-columns: 1fr auto; gap: .5rem; margin-bottom: .5rem; }
+.adm-list-row.obj { grid-template-columns: 130px 1fr 1.6fr auto; }
+.adm-drawer-backdrop { position: fixed; inset: 0; background: rgba(8,21,58,.45); z-index: 1070; }
+.adm-drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(860px, 100vw); background: var(--vk-paper); z-index: 1080; overflow-y: auto; box-shadow: -20px 0 60px rgba(0,0,0,.25); }
+.adm-drawer header { position: sticky; top: 0; background: #fff; border-bottom: 1px solid var(--vk-line); padding: 1rem 1.4rem; display: flex; align-items: center; gap: 1rem; z-index: 2; }
+.adm-drawer .body { padding: 1.4rem; }
+.adm-empty { padding: 3rem 1rem; text-align: center; color: var(--vk-muted); }
+.adm-detail dt { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--vk-muted); }
+.adm-detail dd { margin-bottom: .8rem; font-weight: 600; }
+@media (max-width: 767.98px) { .adm-list-row.obj { grid-template-columns: 1fr; } }
