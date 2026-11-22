@@ -38,8 +38,11 @@ Route::middleware(TrackVisit::class)->group(function () {
 
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap.xml');
 
-// Images téléversées depuis l'admin : secours si le lien public/storage manque
-Route::get('/storage/{path}', MediaController::class)->where('path', '.*')->name('media');
+// Images téléversées depuis l'admin, livrées par Laravel : ne dépend pas du lien
+// symbolique public/storage (absent, cassé ou refusé par Apache en mutualisé).
+Route::get('/media/{path}', MediaController::class)->where('path', '.*')->name('media');
+// Anciennes adresses /storage/... (liens déjà partagés) : même traitement si le lien manque
+Route::get('/storage/{path}', MediaController::class)->where('path', '.*')->name('media.legacy');
 
 // Formulaires (anti-spam : limitation de fréquence + champ piège)
 Route::middleware('throttle:6,1')->group(function () {

@@ -5,10 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Sert les fichiers téléversés depuis l'admin (disque « public ») lorsque le lien
- * public/storage est absent ou cassé (hébergement mutualisé, envoi FTP…).
- * Si le lien existe, le serveur web livre le fichier directement et cette route
- * n'est jamais appelée.
+ * Sert les fichiers téléversés depuis l'admin (disque « public », storage/app/public)
+ * via l'adresse /media/... : aucune dépendance au lien symbolique public/storage,
+ * souvent absent, copié en dossier par FTP ou refusé par Apache en mutualisé.
  */
 class MediaController extends Controller
 {

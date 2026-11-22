@@ -44,7 +44,7 @@ Le script `deploy.sh` rejoue ces étapes lors des mises à jour.
    *Si ce n'est pas possible* : placez le projet à la racine du site ; le fichier `.htaccess` fourni à la racine redirige automatiquement vers `public/`.
 4. Copiez `.env.example` en `.env` et complétez-le (gestionnaire de fichiers du panneau). Pour `APP_KEY`, générez une clé sur votre poste avec `php artisan key:generate --show`.
 5. Importez la base : sur votre poste, lancez `php artisan migrate --seed` sur une base locale puis exportez-la (phpMyAdmin) et importez-la chez l'hébergeur. Ou, si le panneau propose un « terminal » ou des « tâches cron », exécutez `php artisan migrate --seed --force` une fois.
-6. Lien des fichiers envoyés : créez le lien `public/storage → storage/app/public` (`php artisan storage:link`, ou via le gestionnaire de fichiers si le panneau permet les liens symboliques).
+6. Images envoyées depuis l'admin : elles sont livrées par l'adresse `/media/...` directement depuis `storage/app/public`. Le lien `public/storage` n'est plus nécessaire.
 
 ## 4. Configuration du fichier `.env`
 
@@ -78,4 +78,10 @@ Sauvegardez régulièrement la base MySQL et le dossier `storage/app` (photos en
 ```bash
 git pull                     # ou envoi des fichiers modifiés
 ./deploy.sh
+```
+
+Sans Composer ni Node sur le serveur (mutualisé), après un `git pull` :
+
+```bash
+php artisan optimize:clear   # vide les caches de routes, config et vues
 ```

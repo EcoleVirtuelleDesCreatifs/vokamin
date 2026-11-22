@@ -24,9 +24,11 @@ if (! function_exists('media_url')) {
             return asset($path);
         }
 
+        // Livrée par la route /media (MediaController) et non par le lien public/storage,
+        // que les hébergements mutualisés (LWS…) refusent souvent de suivre.
         // URL construite à partir du domaine de la requête (et non d'APP_URL) :
         // l'image s'affiche même si APP_URL est resté sur « localhost ».
-        return asset('storage/'.ltrim($path, '/'));
+        return asset('media/'.ltrim($path, '/'));
     }
 }
 
