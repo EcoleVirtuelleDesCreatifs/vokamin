@@ -24,15 +24,23 @@ const views = [
     { id: 'parametres', label: 'Coordonnées & textes', icon: 'fa-gear', comp: Settings },
 ];
 const current = ref(views[0].id);
+// Sous-page de la vue (ex. #actualites/nouvelle → « nouvelle »)
+const subpath = ref('');
 const menuOpen = ref(false);
 const pending = ref(0);
 const view = computed(() => views.find((v) => v.id === current.value) || views[0]);
+const pageTitle = computed(() => {
+    if (current.value === 'actualites' && subpath.value === 'nouvelle') return 'Nouvelle actualité';
+    if (current.value === 'actualites' && subpath.value.startsWith('modifier/')) return 'Modifier l\'actualité';
+    return view.value.label;
+});
 const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
 function syncHash() {
-    const h = window.location.hash.replace('#', '');
+    const [h, ...rest] = decodeURIComponent(window.location.hash.replace('#', '')).split('/');
     current.value = views.some((v) => v.id === h) ? h : views[0].id;
+    subpath.value = rest.join('/');
     menuOpen.value = false;
     window.scrollTo(0, 0);
 }
@@ -46,10 +54,15 @@ onBeforeUnmount(() => window.removeEventListener('hashchange', syncHash));
         <aside class="adm-side" :class="{ open: menuOpen }">
             <a :href="siteUrl" class="d-block mb-4" target="_blank" rel="noopener"><img :src="logo" alt="VOKAMIN" style="height:48px;width:auto"></a>
             <nav class="adm-nav">
-                <a v-for="v in views" :key="v.id" :href="`#${v.id}`" :class="{ active: current === v.id }">
-                    <i class="fa-solid" :class="v.icon"></i>{{ v.label }}
-                    <span v-if="v.id === 'demandes' && pending" class="pill">{{ pending }}</span>
-                </a>
+                <template v-for="v in views" :key="v.id">
+                    <a :href="`#${v.id}`" :class="{ active: current === v.id && !(v.id === 'actualites' && subpath === 'nouvelle') }">
+                        <i class="fa-solid" :class="v.icon"></i>{{ v.label }}
+                        <span v-if="v.id === 'demandes' && pending" class="pill">{{ pending }}</span>
+                    </a>
+                    <a v-if="v.id === 'actualites'" href="#actualites/nouvelle" class="adm-nav-sub" :class="{ active: current === 'actualites' && subpath === 'nouvelle' }">
+                        <i class="fa-solid fa-pen-to-square"></i>Écrire une actualité
+                    </a>
+                </template>
             </nav>
             <div class="mt-auto pt-4 small" style="color:var(--vk-on-ink-muted)">
                 <div class="d-flex align-items-center gap-2 mb-3"><span class="adm-avatar">{{ (user?.name || 'A').slice(0, 2).toUpperCase() }}</span><span>{{ user?.name }}<br><span style="font-size:.75rem">{{ user?.email }}</span></span></div>
@@ -59,11 +72,11 @@ onBeforeUnmount(() => window.removeEventListener('hashchange', syncHash));
         <main class="adm-main">
             <header class="adm-top">
                 <button class="adm-burger" type="button" aria-label="Menu" @click="menuOpen = !menuOpen"><i class="fa-solid fa-bars"></i></button>
-                <div><h1 class="h4 mb-0">{{ view.label }}</h1><span class="small text-muted-vk text-capitalize">{{ today }}</span></div>
+                <div><h1 class="h4 mb-0">{{ pageTitle }}</h1><span class="small text-muted-vk text-capitalize">{{ today }}</span></div>
                 <div class="ms-auto"><a class="btn-vk sm ghost" :href="siteUrl" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="d-none d-sm-inline">Voir le site</span></a></div>
             </header>
             <section class="adm-view active">
-                <component :is="view.comp" :key="view.id" :quote-file-url="quoteFileUrl" :cv-url="cvUrl" :site-url="siteUrl" @pending="pending = $event" @go="go" />
+                <component :is="view.comp" :key="view.id" :quote-file-url="quoteFileUrl" :cv-url="cvUrl" :site-url="siteUrl" :subpath="subpath" @pending="pending = $event" @go="go" />
             </section>
         </main>
     </div>

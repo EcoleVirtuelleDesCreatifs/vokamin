@@ -1,11 +1,12 @@
 <script setup>
-import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, reactive, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { get, post, patch, del, toFormData, fmtDate, failMessage } from '../api';
 import { toast } from '../../lib/toast';
 import ConfirmButton from '../ConfirmButton.vue';
 import RichEditor from '../RichEditor.vue';
 
-const props = defineProps({ siteUrl: String });
+// subpath : '' (liste), 'nouvelle' (création) ou 'modifier/<slug>' (modification)
+const props = defineProps({ siteUrl: String, subpath: { type: String, default: '' } });
 const posts = ref([]);
 const loading = ref(true);
 const editing = ref(null);
@@ -19,7 +20,25 @@ const search = ref('');
 const cats = ['Projet', 'Chantier', 'Projet livré', 'Conseil BTP', 'Partenariat', 'Événement', "Offre d'emploi", 'Communiqué'];
 
 const load = async () => { loading.value = true; posts.value = await get('/posts'); loading.value = false; };
-onMounted(load);
+
+// Chaque écran a sa propre adresse : #actualites, #actualites/nouvelle, #actualites/modifier/<slug>
+const go = (path) => { window.location.hash = path ? `actualites/${path}` : 'actualites'; };
+function openFromRoute() {
+    const sub = props.subpath || '';
+    if (sub === 'nouvelle') {
+        if (!editing.value || editing.value.id) edit(null);
+    } else if (sub.startsWith('modifier/')) {
+        const slug = sub.slice('modifier/'.length);
+        const p = posts.value.find((x) => x.slug === slug);
+        if (p && editing.value?.slug !== slug) edit(p);
+        else if (!p && !loading.value) { toast('Article introuvable.', 'fa-triangle-exclamation'); go(''); }
+    } else {
+        editing.value = null;
+        dirty.value = false;
+    }
+}
+watch(() => props.subpath, openFromRoute);
+onMounted(async () => { await load(); openFromRoute(); });
 
 const filtered = computed(() => {
     const q = search.value.trim().toLowerCase();
@@ -43,8 +62,8 @@ function edit(p) {
 
 function close() {
     if (dirty.value && !window.confirm('Des modifications ne sont pas enregistrées. Quitter quand même ?')) return;
-    editing.value = null;
     dirty.value = false;
+    go('');
 }
 
 function onCover(e) {
@@ -69,11 +88,12 @@ async function save() {
     await load();
     // On reste sur la page d'édition, avec les données à jour (galerie, image, adresse)
     edit(res.data);
+    if (props.subpath !== `modifier/${res.data.slug}`) go(`modifier/${res.data.slug}`);
 }
 
 async function destroy() {
     const res = await del(`/posts/${editing.value.slug}`);
-    if (res.ok) { dirty.value = false; editing.value = null; toast('Article supprimé.'); load(); }
+    if (res.ok) { dirty.value = false; toast('Article supprimé.'); await load(); go(''); }
 }
 
 async function caption(img) { await patch(`/post-images/${img.id}`, { caption: img.caption }); toast('Légende enregistrée.'); }
@@ -105,16 +125,16 @@ onBeforeUnmount(() => { window.removeEventListener('keydown', onKey); window.rem
     <template v-if="!editing">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
             <input v-model="search" class="form-control form-control-sm" style="max-width:280px" type="search" placeholder="Rechercher un article…" aria-label="Rechercher un article">
-            <button class="btn-vk sm" type="button" @click="edit(null)"><i class="fa-solid fa-plus"></i> Nouvelle actualité</button>
+            <a class="btn-vk sm" href="#actualites/nouvelle"><i class="fa-solid fa-plus"></i> Nouvelle actualité</a>
         </div>
         <div class="adm-card"><div v-if="loading" class="adm-empty"><span class="spinner"></span></div><div v-else class="table-wrap"><table class="table adm-table">
             <thead><tr><th></th><th>Titre</th><th>Catégorie</th><th>Date</th><th>Statut</th><th></th></tr></thead>
-            <tbody><tr v-for="p in filtered" :key="p.id" class="pe-row" @click="edit(p)">
+            <tbody><tr v-for="p in filtered" :key="p.id" class="pe-row" @click="go(`modifier/${p.slug}`)">
                 <td><img class="thumb" :src="p.cover_url" alt=""></td>
                 <td><strong>{{ p.title }}</strong><span v-if="p.images?.length" class="small text-muted-vk d-block"><i class="fa-regular fa-images me-1"></i>{{ p.images.length }} photo(s) en galerie</span></td>
                 <td>{{ p.category }}</td><td>{{ fmtDate(p.published_at) }}</td>
                 <td><span class="st" :class="p.is_published ? 'done' : 'prog'">{{ p.is_published ? 'Publié' : 'Brouillon' }}</span></td>
-                <td class="text-end text-nowrap" @click.stop><a class="icon-btn" :href="publicUrl(p)" target="_blank" rel="noopener" aria-label="Voir"><i class="fa-regular fa-eye"></i></a><button class="icon-btn" type="button" aria-label="Modifier" @click="edit(p)"><i class="fa-solid fa-pen"></i></button></td>
+                <td class="text-end text-nowrap" @click.stop><a class="icon-btn" :href="publicUrl(p)" target="_blank" rel="noopener" aria-label="Voir"><i class="fa-regular fa-eye"></i></a><a class="icon-btn" :href="`#actualites/modifier/${p.slug}`" aria-label="Modifier"><i class="fa-solid fa-pen"></i></a></td>
             </tr><tr v-if="!filtered.length"><td colspan="6" class="adm-empty">Aucune actualité.</td></tr></tbody>
         </table></div></div>
     </template>
@@ -122,7 +142,7 @@ onBeforeUnmount(() => { window.removeEventListener('keydown', onKey); window.rem
     <!-- ===== Page d'édition ===== -->
     <form v-else class="pe form-vk" novalidate @submit.prevent="save" @input="dirty = true">
         <div class="pe-bar">
-            <button class="btn-vk sm ghost" type="button" @click="close"><i class="fa-solid fa-arrow-left"></i> Actualités</button>
+            <button class="btn-vk sm ghost" type="button" @click="close"><i class="fa-solid fa-arrow-left"></i> Toutes les actualités</button>
             <span class="pe-state small"><span class="st" :class="editing.is_published ? 'done' : 'prog'">{{ editing.is_published ? 'Publié' : 'Brouillon' }}</span><span v-if="dirty" class="text-muted-vk ms-2">Modifications non enregistrées</span></span>
             <div class="ms-auto d-flex gap-2">
                 <a v-if="editing.id" class="btn-vk sm ghost" :href="publicUrl(editing)" target="_blank" rel="noopener"><i class="fa-regular fa-eye"></i> <span class="d-none d-md-inline">Voir l'article</span></a>

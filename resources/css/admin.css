@@ -72,3 +72,7 @@
 .rte-content img:hover { outline: 3px solid rgba(11,47,143,.25); }
 .rte-content figcaption:empty::before { content: 'Légende…'; color: #b9bfcb; }
 .rte-foot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .5rem; padding: .45rem .75rem; border-top: 1px solid var(--vk-line); font-size: .74rem; color: var(--vk-muted); background: #fbfbfc; }
+
+/* Lien « Écrire une actualité » sous « Actualités » dans le menu */
+.adm-nav a.adm-nav-sub { padding-left: 2.6rem; font-size: .84rem; }
+.adm-nav a.adm-nav-sub i { font-size: .8rem; }
