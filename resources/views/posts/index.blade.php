@@ -8,7 +8,7 @@
     <div class="container">
         @if ($featured)
             <a class="news-featured reveal" href="{{ route('posts.show', $featured) }}">
-                <div class="ph"><img src="{{ media_url($featured->image) }}" alt=""></div>
+                <div class="ph"><img src="{{ $featured->cover_url }}" alt=""></div>
                 <div><span class="eyebrow">À la une</span><div class="news-meta"><span class="cat">{{ $featured->category }}</span>@if ($featured->published_at)<time datetime="{{ $featured->published_at->toDateString() }}">{{ $featured->published_at->translatedFormat('j F Y') }}</time>@endif</div><h2 class="display">{{ $featured->title }}</h2><p class="lead-vk">{{ $featured->excerpt }}</p><span class="link-arrow mt-2">Lire l'article <i class="fa-solid fa-arrow-right"></i></span></div>
             </a>
             <hr class="my-5" style="border-color:var(--vk-line);opacity:1">

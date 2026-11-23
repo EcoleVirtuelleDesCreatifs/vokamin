@@ -18,7 +18,7 @@ class PageController extends Controller
             'services' => Service::published()->get(),
             'projects' => $featured->isNotEmpty() ? $featured : Project::published()->with('images')->take(6)->get(),
             'slides' => $featured->take(4),
-            'posts' => Post::published()->take(3)->get(),
+            'posts' => Post::published()->with('images')->take(3)->get(),
             'references' => ClientReference::where('is_published', true)->orderBy('position')->get(),
             'stats' => [
                 'services' => Service::published()->count(),

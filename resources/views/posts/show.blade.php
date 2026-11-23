@@ -1,11 +1,11 @@
 @extends('layouts.app')
 @section('title', $post->title)
 @section('description', $post->excerpt)
-@section('og_image', media_url($post->image))
+@section('og_image', $post->cover_url)
 
 @section('content')
 <section class="page-hero" style="min-height:560px">
-    <img src="{{ media_url($post->image) }}" alt="">
+    <img src="{{ $post->cover_url }}" alt="">
     <div class="container">
         <nav class="crumbs" aria-label="Fil d'Ariane"><a href="{{ route('home') }}">Accueil</a><span class="sep">/</span><a href="{{ route('posts.index') }}">Actualités</a><span class="sep">/</span><span aria-current="page">{{ $post->category }}</span></nav>
         <div class="news-meta" style="color:rgba(255,255,255,.7)"><span class="cat" style="color:#8fd9a1">{{ $post->category }}</span>@if ($post->published_at)<time datetime="{{ $post->published_at->toDateString() }}">{{ $post->published_at->translatedFormat('j F Y') }}</time>@endif<span>{{ $post->reading_time }} min de lecture</span></div>
@@ -16,6 +16,14 @@
     <div class="container"><div class="row g-5">
         <article class="col-lg-8">
             <div class="article-body">{!! \App\Support\RichText::render($post->body) !!}</div>
+            @if ($post->images->isNotEmpty())
+            <div id="galerie" class="mt-5">
+                <div class="section-head mb-4"><div><span class="eyebrow">Galerie</span><h2 class="display">En images</h2></div><p class="text-muted-vk mb-0 small">{{ $post->images->count() }} {{ $post->images->count() > 1 ? 'photos' : 'photo' }} · cliquez pour agrandir</p></div>
+                <div data-vue="ProjectGallery" data-props="{{ json_encode(['images' => $post->images->map(fn ($i) => ['url' => $i->url, 'caption' => $i->caption])->values()]) }}">
+                    <div class="gallery gallery-{{ min($post->images->count(), 4) }}">@foreach ($post->images as $img)<a href="{{ $img->url }}"><img src="{{ $img->url }}" alt="{{ $img->caption }}" loading="lazy"></a>@endforeach</div>
+                </div>
+            </div>
+            @endif
             @php $share = urlencode(route('posts.show', $post)); @endphp
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mt-5 pt-4" style="border-top:1px solid var(--vk-line)">
                 <div class="share"><span>Partager</span>

@@ -14,6 +14,18 @@ class Post extends Model
         return ['published_at' => 'datetime', 'is_published' => 'boolean'];
     }
 
+    /** Photos supplémentaires de l'actualité, dans l'ordre choisi dans l'admin. */
+    public function images()
+    {
+        return $this->hasMany(PostImage::class)->orderBy('position')->orderBy('id');
+    }
+
+    /** Image principale, ou à défaut la première photo de la galerie. */
+    public function getCoverUrlAttribute(): string
+    {
+        return media_url($this->image ?: optional($this->images->first())->path);
+    }
+
     public function getRouteKeyName(): string
     {
         return 'slug';
