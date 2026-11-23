@@ -80,8 +80,13 @@ git pull                     # ou envoi des fichiers modifiés
 ./deploy.sh
 ```
 
+Les fichiers CSS/JS compilés (`public/build`) sont produits automatiquement par GitHub
+(workflow « Compilation des fichiers du site ») et enregistrés dans le dépôt : pas besoin
+de Node.js sur le serveur.
+
 Sans Composer ni Node sur le serveur (mutualisé), après un `git pull` :
 
 ```bash
+php artisan migrate --force   # nouvelles tables éventuelles
 php artisan optimize:clear   # vide les caches de routes, config et vues
 ```
