@@ -21,7 +21,7 @@ return [
         'hero_lead' => 'Concevoir. Bâtir. Sublimer. Entretenir. Une seule équipe, de la première esquisse à la remise des clés.',
         'tel1' => '+225 07 08 07 11 32',
         'tel2' => '+225 01 01 16 81 81',
-        'fax' => '+225 07 08 07 11 32',
+        'fax' => '',
         'whatsapp' => '+225 07 08 07 11 32',
         'whatsapp_message' => 'Bonjour VOKAMIN, je souhaite obtenir des informations concernant un projet.',
         'email' => 'info@vokamin.com',

@@ -37,6 +37,8 @@ Route::middleware(TrackVisit::class)->group(function () {
 });
 
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap.xml');
+// robots.txt généré : l'adresse du sitemap doit être absolue (domaine de la requête)
+Route::get('/robots.txt', fn () => response("User-agent: *\nDisallow: /admin\n\nSitemap: ".url('/sitemap.xml')."\n", 200, ['Content-Type' => 'text/plain; charset=UTF-8']))->name('robots');
 
 // Images téléversées depuis l'admin, livrées par Laravel : ne dépend pas du lien
 // symbolique public/storage (absent, cassé ou refusé par Apache en mutualisé).

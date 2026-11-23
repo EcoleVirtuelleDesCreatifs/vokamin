@@ -7,8 +7,15 @@
     @php
         $y = fn ($k) => html_entity_decode(trim($__env->yieldContent($k)), ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $pageTitle = $y('title');
-        $fullTitle = $pageTitle ? (str_contains($pageTitle, 'VOKAMIN') ? $pageTitle : $pageTitle.' | VOKAMIN Côte d\'Ivoire') : 'VOKAMIN Côte d\'Ivoire — Entreprise BTP à Abidjan';
-        $desc = $y('description') ?: 'VOKAMIN SARL, entreprise BTP à Abidjan : construction, conception 2D/3D, rénovation, Building Maintenance, négoce et enseignes en Côte d\'Ivoire.';
+        // Titre ≤ 65 caractères et description ≤ 155 : au-delà, Google les tronque.
+        $fullTitle = $pageTitle ? (str_contains($pageTitle, 'VOKAMIN') || mb_strlen($pageTitle) > 54 ? $pageTitle : $pageTitle.' | VOKAMIN') : 'Entreprise BTP à Abidjan | VOKAMIN Côte d\'Ivoire';
+        if (mb_strlen($fullTitle) > 65) {
+            $fullTitle = rtrim(mb_substr($fullTitle, 0, mb_strrpos(mb_substr($fullTitle, 0, 64), ' ') ?: 64), ' ,:;—–-|').'…';
+        }
+        $desc = preg_replace('/\s+/u', ' ', $y('description') ?: 'VOKAMIN SARL, entreprise BTP à Abidjan : construction, conception 2D/3D, rénovation, maintenance, négoce et enseignes en Côte d\'Ivoire.');
+        if (mb_strlen($desc) > 155) {
+            $desc = rtrim(mb_substr($desc, 0, mb_strrpos(mb_substr($desc, 0, 154), ' ') ?: 154), ' ,:;—–-(').'…';
+        }
         $ogImage = $y('og_image') ?: asset('images/villa-signature-piscine.jpg');
     @endphp
     <title>{{ $fullTitle }}</title>
@@ -24,6 +31,9 @@
     <meta property="og:locale" content="fr_CI">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('favicon-32.png') }}" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+    <link rel="manifest" href="{{ asset('site.webmanifest') }}">
     @hasSection('preload')<link rel="preload" as="image" href="{{ $y('preload') }}">@endif
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

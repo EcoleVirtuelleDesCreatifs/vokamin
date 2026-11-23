@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', "VOKAMIN Côte d'Ivoire — Entreprise BTP à Abidjan : construction, rénovation, maintenance")
-@section('description', 'VOKAMIN SARL, entreprise BTP à Abidjan : construction de villas, conception de plans 2D/3D, rénovation, décoration, Building Maintenance, négoce de matériaux et enseignes en Côte d\'Ivoire.')
+@section('title', 'Entreprise BTP à Abidjan : construction, rénovation | VOKAMIN')
+@section('description', 'VOKAMIN, entreprise BTP à Abidjan : construction de villas, plans 2D/3D, rénovation, décoration, maintenance de bâtiments et négoce en Côte d\'Ivoire.')
 @if ($slides->isNotEmpty())
     @section('preload', $slides->first()->cover_url)
     @section('og_image', $slides->first()->cover_url)
@@ -10,9 +10,19 @@
 @push('head')
 <script type="application/ld+json">{!! json_encode([
     '@context' => 'https://schema.org', '@type' => 'GeneralContractor', 'name' => setting('company_name'), 'alternateName' => setting('brand'),
-    'slogan' => setting('tagline'), 'url' => url('/'), 'logo' => asset('images/logo-vokamin.png'), 'telephone' => setting('tel1'),
-    'email' => setting('email'), 'foundingDate' => '2022-05-18',
-    'address' => ['@type' => 'PostalAddress', 'streetAddress' => setting('address'), 'addressLocality' => 'Abidjan', 'postOfficeBoxNumber' => setting('bp'), 'addressCountry' => 'CI'],
+    'slogan' => setting('tagline'), 'url' => url('/'), 'logo' => asset('images/logo-vokamin.png'), 'image' => asset('images/villa-signature-piscine.jpg'),
+    'telephone' => setting('tel1'), 'email' => setting('email'), 'foundingDate' => '2022-05-18',
+    'address' => ['@type' => 'PostalAddress', 'streetAddress' => setting('address'), 'addressLocality' => 'Abidjan', 'addressRegion' => 'Cocody', 'postOfficeBoxNumber' => setting('bp'), 'addressCountry' => 'CI'],
+    'contactPoint' => array_values(array_filter([
+        ['@type' => 'ContactPoint', 'telephone' => setting('tel1'), 'contactType' => 'customer service', 'areaServed' => 'CI', 'availableLanguage' => 'French'],
+        setting('tel2') ? ['@type' => 'ContactPoint', 'telephone' => setting('tel2'), 'contactType' => 'sales', 'areaServed' => 'CI', 'availableLanguage' => 'French'] : null,
+    ])),
+    'openingHours' => array_values(array_filter([
+        \App\Support\Schema::hours('Mo-Fr', setting('hours_week')),
+        \App\Support\Schema::hours('Sa', setting('hours_sat')),
+        \App\Support\Schema::hours('Su', setting('hours_sun')),
+    ])),
+    'sameAs' => array_values(array_filter([setting('facebook'), setting('linkedin'), setting('instagram'), setting('youtube')])),
     'areaServed' => "Côte d'Ivoire",
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 @endpush
@@ -20,12 +30,12 @@
 @section('content')
 <section class="hero" aria-label="Présentation">
     <div data-vue="HeroSlider" data-props="{{ json_encode(['slides' => $slides->map(fn ($p) => ['image' => $p->cover_url, 'title' => $p->name, 'loc' => $p->location.' · '.$p->category, 'href' => route('projects.show', $p)])->values()]) }}" class="hero-slides">
-        @if ($slides->isNotEmpty())<div class="hero-slide active"><img src="{{ $slides->first()->cover_url }}" alt="" fetchpriority="high"></div>@endif
+        @if ($slides->isNotEmpty())<div class="hero-slide active"><img src="{{ $slides->first()->cover_url }}" alt="{{ $slides->first()->name }}, {{ $slides->first()->location }}" fetchpriority="high"></div>@endif
     </div>
     <div class="hero-content">
         <div class="container">
-            <span class="eyebrow">BTP · Promotion immobilière · Côte d'Ivoire</span>
-            <h1 class="display">{!! str_replace(['co-créons', ', un avenir.'], ['co&#8209;créons', ', <em>un avenir.</em>'], e(setting('tagline'))) !!}</h1>
+            <span class="eyebrow">Entreprise BTP à Abidjan · Promotion immobilière</span>
+            <h1 class="display"><span class="visually-hidden">VOKAMIN, entreprise BTP à Abidjan : </span>{!! str_replace(['co-créons', ', un avenir.'], ['co&#8209;créons', ', <em>un avenir.</em>'], e(setting('tagline'))) !!}</h1>
             <p class="lead-vk">{{ setting('hero_lead') }}</p>
             <div class="hero-ctas">
                 <a class="btn-vk" href="{{ route('projects.index') }}">Découvrir nos réalisations <i class="fa-solid fa-arrow-right"></i></a>
@@ -41,7 +51,7 @@
         <div class="row g-5 align-items-center">
             <div class="col-lg-6 order-lg-2">
                 <span class="eyebrow">Qui sommes-nous</span>
-                <p class="intro-statement reveal">Un projet. <strong>Un seul interlocuteur.</strong> Zéro compromis sur la qualité.</p>
+                <h2 class="intro-statement reveal">Un projet. <strong>Un seul interlocuteur.</strong> Zéro compromis sur la qualité.</h2>
                 <p class="lead-vk reveal d1 mt-4">Depuis 2022, VOKAMIN accompagne particuliers, entreprises, institutions et promoteurs. Chaque décision se prend avec vous ; un responsable unique coordonne tous les métiers.</p>
                 <div class="d-flex flex-wrap gap-4 align-items-center mt-4 reveal d2">
                     <a class="btn-vk blue" href="{{ route('company') }}">Découvrir l'entreprise <i class="fa-solid fa-arrow-right"></i></a>
@@ -52,7 +62,7 @@
                 <div class="split-img img-reveal">
                     <img class="main" src="{{ asset('images/villa-signature.jpg') }}" alt="Villa contemporaine conçue par VOKAMIN" loading="lazy">
                     <img class="float" src="{{ asset('images/maureen-piscine-1.jpg') }}" alt="Piscine de la Villa Maureen" loading="lazy">
-                    <div class="tag">Depuis<strong>2022</strong></div>
+                    <div class="tag" aria-hidden="true">Depuis<strong>2022</strong></div>
                 </div>
             </div>
         </div>
@@ -75,7 +85,7 @@
         <div class="bento">
             @foreach ($services as $i => $s)
                 <a class="tile {{ $tileClasses[$i] ?? 't-d' }} reveal d{{ $i % 3 + 1 }}" href="{{ route('services.show', $s) }}">
-                    <img src="{{ media_url($s->image) }}" alt="" loading="lazy" decoding="async">
+                    <img src="{{ media_url($s->image) }}" alt="{{ $s->name }} à Abidjan — VOKAMIN" loading="lazy" decoding="async">
                     <span class="tile-idx"><b>{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}</b></span>
                     <span class="tile-go"><i class="fa-solid fa-arrow-right"></i></span>
                     <h3>{{ $s->name }}</h3><p>{{ $s->teaser }}</p>

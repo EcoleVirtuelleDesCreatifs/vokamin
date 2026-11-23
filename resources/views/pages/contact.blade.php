@@ -12,7 +12,7 @@
             <div class="contact-card"><i class="fa-solid fa-phone"></i><div><small>Téléphones</small>
                 <a href="{{ tel_href(setting('tel1')) }}" data-track="call">{{ setting('tel1') }}</a><button class="copy-btn" data-copy="{{ setting('tel1') }}" aria-label="Copier"><i class="fa-regular fa-copy"></i></button>
                 @if (setting('tel2'))<br><a href="{{ tel_href(setting('tel2')) }}" data-track="call">{{ setting('tel2') }}</a><button class="copy-btn" data-copy="{{ setting('tel2') }}" aria-label="Copier"><i class="fa-regular fa-copy"></i></button>@endif
-                @if (setting('fax'))<br><span class="small text-muted-vk fw-normal">Fax : {{ setting('fax') }}</span>@endif
+                @if (setting('fax') && ! in_array(tel_href(setting('fax')), [tel_href(setting('tel1')), tel_href(setting('tel2'))]))<br><span class="small text-muted-vk fw-normal">Fax : {{ setting('fax') }}</span>@endif
             </div></div>
             <div class="contact-card"><i class="fa-solid fa-envelope"></i><div><small>Email</small><a href="mailto:{{ setting('email') }}">{{ setting('email') }}</a><button class="copy-btn" data-copy="{{ setting('email') }}" aria-label="Copier"><i class="fa-regular fa-copy"></i></button></div></div>
             <div class="contact-card"><i class="fa-regular fa-clock"></i><div class="w-100"><small>Horaires</small><div class="hours mt-2">

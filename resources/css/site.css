@@ -453,6 +453,20 @@ body.is-loading .page-curtain { opacity: 1; }
 .cookie-banner.show { transform: none; }
 .cookie-banner h5 { font-family: var(--ff-display); font-size: 1.25rem; font-weight: 500; }
 .cookie-banner p { font-size: .84rem; color: var(--vk-muted); line-height: 1.6; }
+/* Bannière compacte : petite carte sur mobile, barre basse fine sur ordinateur (ne masque plus les CTA ni les formulaires) */
+.cookie-banner { padding: 1rem 1.1rem; }
+.cookie-banner h5 { font-size: 1rem; margin-bottom: .35rem; }
+.cookie-banner p { margin-bottom: .75rem; }
+@media (min-width: 768px) {
+  .cookie-banner {
+    left: 0; right: 0; bottom: 0; width: auto; display: flex; align-items: center; gap: 1.5rem;
+    padding: .7rem 110px calc(.7rem + env(safe-area-inset-bottom, 0px)) max(1.5rem, calc((100vw - 1280px) / 2));
+    border-top-width: 2px; box-shadow: 0 -12px 30px -18px rgba(8,21,58,.35);
+  }
+  .cookie-banner h5 { display: none; }
+  .cookie-banner p { margin: 0; flex: 1; font-size: .8rem; }
+  .cookie-banner .d-flex { flex-wrap: nowrap !important; flex-shrink: 0; }
+}
 
 /* ---------- Formulaires ---------- */
 .form-vk .form-label { font-size: .74rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--vk-ink); margin-bottom: .45rem; }

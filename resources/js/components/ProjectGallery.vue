@@ -29,8 +29,8 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
 
 <template>
     <div :class="layout">
-        <a v-for="(img, i) in images" :key="img.url" :href="img.url" @click.prevent="open(i)">
-            <img :src="img.url" :alt="img.caption || ''" loading="lazy" decoding="async">
+        <a v-for="(img, i) in images" :key="img.url" :href="img.url" :aria-label="`Agrandir la photo ${i + 1} : ${img.caption || img.alt || ''}`" @click.prevent="open(i)">
+            <img :src="img.url" :alt="img.caption || img.alt || ''" loading="lazy" decoding="async">
         </a>
     </div>
 
@@ -42,7 +42,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
                 <button ref="closeBtn" class="lb-btn lb-close" type="button" aria-label="Fermer" @click="close"><i class="fa-solid fa-xmark"></i></button>
                 <button v-if="images.length > 1" class="lb-btn lb-prev" type="button" aria-label="Photo précédente" @click="move(-1)"><i class="fa-solid fa-arrow-left"></i></button>
                 <figure>
-                    <Transition name="fade" mode="out-in"><img :key="images[index].url" :src="images[index].url" :alt="images[index].caption || ''"></Transition>
+                    <Transition name="fade" mode="out-in"><img :key="images[index].url" :src="images[index].url" :alt="images[index].caption || images[index].alt || ''"></Transition>
                     <figcaption><span>{{ images[index].caption }}</span><span class="ct">{{ pad(index + 1) }} / {{ pad(images.length) }}</span></figcaption>
                 </figure>
                 <button v-if="images.length > 1" class="lb-btn lb-next" type="button" aria-label="Photo suivante" @click="move(1)"><i class="fa-solid fa-arrow-right"></i></button>

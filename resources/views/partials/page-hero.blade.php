@@ -1,4 +1,7 @@
 {{-- Paramètres : $title (HTML autorisé), $lead, $image, $crumbs (tableau [libellé => url|null]), $eyebrow --}}
+@push('head')
+{!! \App\Support\Schema::breadcrumb($crumbs ?? []) !!}
+@endpush
 <section class="page-hero">
     <img src="{{ $image }}" alt="">
     <div class="container">

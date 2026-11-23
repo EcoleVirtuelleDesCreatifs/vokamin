@@ -3,6 +3,16 @@
 @section('description', $service->name." par VOKAMIN en Côte d'Ivoire : ".$service->teaser)
 @section('og_image', media_url($service->hero_image))
 
+@push('head')
+{!! \App\Support\Schema::json([
+    '@context' => 'https://schema.org', '@type' => 'Service', 'name' => $service->name, 'description' => $service->teaser,
+    'serviceType' => $service->name, 'image' => media_url($service->hero_image), 'url' => route('services.show', $service),
+    'areaServed' => ['@type' => 'Country', 'name' => "Côte d'Ivoire"],
+    'provider' => ['@type' => 'GeneralContractor', 'name' => setting('company_name'), 'url' => url('/'), 'telephone' => setting('tel1'),
+        'address' => ['@type' => 'PostalAddress', 'streetAddress' => setting('address'), 'addressLocality' => 'Abidjan', 'addressCountry' => 'CI']],
+]) !!}
+@endpush
+
 @section('content')
 @include('partials.page-hero', ['title' => e($service->name), 'lead' => $service->teaser, 'image' => media_url($service->hero_image), 'crumbs' => ['Nos services' => route('services.index'), $service->short => null], 'eyebrow' => 'Service'])
 <section class="section">
@@ -17,7 +27,7 @@
         <div class="col-lg-9">
             <div class="row g-4 align-items-center mb-5">
                 <div class="col-md-7"><span class="eyebrow">Description</span><p class="intro-statement reveal" style="font-size:clamp(1.25rem,2vw,1.7rem)">{{ $service->intro }}</p>@if ($service->intro2)<p class="text-muted-vk reveal d1">{{ $service->intro2 }}</p>@endif</div>
-                <div class="col-md-5"><div class="img-reveal"><img src="{{ media_url($service->image2) }}" alt="" class="w-100" style="aspect-ratio:4/5;object-fit:cover" loading="lazy"></div></div>
+                <div class="col-md-5"><div class="img-reveal"><img src="{{ media_url($service->image2) }}" alt="{{ $service->name }} — réalisation VOKAMIN" class="w-100" style="aspect-ratio:4/5;object-fit:cover" loading="lazy"></div></div>
             </div>
             @if (! empty($service->prestations))
                 <div class="mb-5"><h2 class="display" style="font-size:1.8rem">Prestations proposées</h2>

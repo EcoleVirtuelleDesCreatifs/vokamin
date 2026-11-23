@@ -4,9 +4,13 @@
 @section('og_image', $project->cover_url)
 @section('preload', $project->cover_url)
 
+@push('head')
+{!! \App\Support\Schema::breadcrumb(['Réalisations' => route('projects.index'), $project->name => null]) !!}
+@endpush
+
 @section('content')
 <section class="page-hero" style="min-height:min(86svh,820px)">
-    <img src="{{ $project->cover_url }}" alt="" style="opacity:.75">
+    <img src="{{ $project->cover_url }}" alt="{{ $project->name }}, {{ $project->location }}" style="opacity:.75">
     <div class="container">
         <nav class="crumbs" aria-label="Fil d'Ariane"><a href="{{ route('home') }}">Accueil</a><span class="sep">/</span><a href="{{ route('projects.index') }}">Réalisations</a><span class="sep">/</span><span aria-current="page">{{ $project->name }}</span></nav>
         <span class="eyebrow">{{ $project->category }}</span>
@@ -45,8 +49,8 @@
 <section class="section-sm pt-0" id="galerie">
     <div class="container">
         <div class="section-head mb-4"><div><span class="eyebrow">Galerie</span><h2 class="display">En images</h2></div><p class="text-muted-vk mb-0 small">{{ $project->images->count() }} photos · cliquez pour agrandir</p></div>
-        <div data-vue="ProjectGallery" data-props="{{ json_encode(['images' => $project->images->map(fn ($i) => ['url' => $i->url, 'caption' => $i->caption])->values()]) }}">
-            <div class="gallery gallery-{{ min($project->images->count(), 4) }}">@foreach ($project->images as $img)<a href="{{ $img->url }}"><img src="{{ $img->url }}" alt="{{ $img->caption }}" loading="lazy"></a>@endforeach</div>
+        <div data-vue="ProjectGallery" data-props="{{ json_encode(['images' => $project->images->map(fn ($i) => ['url' => $i->url, 'caption' => $i->caption, 'alt' => $i->caption ?: $project->name])->values()]) }}">
+            <div class="gallery gallery-{{ min($project->images->count(), 4) }}">@foreach ($project->images as $k => $img)<a href="{{ $img->url }}" aria-label="Agrandir la photo {{ $k + 1 }} : {{ $img->caption ?: $project->name }}"><img src="{{ $img->url }}" alt="{{ $img->caption ?: $project->name.' — photo '.($k + 1) }}" loading="lazy"></a>@endforeach</div>
         </div>
     </div>
 </section>
