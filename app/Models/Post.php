@@ -39,6 +39,6 @@ class Post extends Model
 
     public function getReadingTimeAttribute(): int
     {
-        return max(1, (int) ceil(str_word_count(strip_tags($this->body)) / 200));
+        return max(1, (int) ceil(preg_match_all('/\S+/u', \App\Support\RichText::plain($this->body)) / 200));
     }
 }

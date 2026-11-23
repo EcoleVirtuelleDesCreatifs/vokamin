@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Post;
 use App\Models\PostImage;
+use App\Support\HtmlSanitizer;
+use App\Support\RichText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -51,6 +53,11 @@ class PostController extends Controller
             'images' => ['nullable', 'array', 'max:'.config('vokamin.upload.max_files', 20)],
             'images.*' => $this->imageRule(),
         ]);
+        // Contenu de l'éditeur visuel : HTML nettoyé (balises d'article uniquement)
+        $data['body'] = HtmlSanitizer::clean($data['body']);
+        if (RichText::plain($data['body']) === '' && ! str_contains($data['body'], '<img')) {
+            return response()->json(['message' => 'Le contenu de l\'article est vide.', 'errors' => ['body' => ['Rédigez le contenu de l\'article.']]], 422);
+        }
         $post->fill(collect($data)->except(['image_file', 'images'])->all());
         $post->is_published = $request->boolean('is_published', true);
         $post->published_at = $data['published_at'] ?? ($post->published_at ?? now());
@@ -71,6 +78,15 @@ class PostController extends Controller
         $this->saveImages($request, $post);
 
         return $this->payload($post);
+    }
+
+    /** Image insérée dans le texte depuis l'éditeur : renvoie son adresse. */
+    public function editorImage(Request $request)
+    {
+        $request->validate(['image' => ['required', ...$this->imageRule()]]);
+        $path = $this->storeImage($request->file('image'), 'actualites/contenu');
+
+        return ['url' => media_url($path), 'path' => $path];
     }
 
     /** Ajoute des photos à la galerie d'une actualité existante. */
@@ -124,6 +140,11 @@ class PostController extends Controller
     {
         $post->load('images');
 
-        return $post->toArray() + ['image_url' => $post->image ? media_url($post->image) : null, 'cover_url' => $post->cover_url];
+        return $post->toArray() + [
+            'image_url' => $post->image ? media_url($post->image) : null,
+            'cover_url' => $post->cover_url,
+            // Contenu prêt pour l'éditeur visuel (les anciens articles sont convertis en HTML)
+            'body_html' => RichText::render($post->body),
+        ];
     }
 }

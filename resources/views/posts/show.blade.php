@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('title', $post->title)
-@section('description', mb_strlen($post->excerpt) < 110 ? $post->excerpt.' — '.\Illuminate\Support\Str::limit(trim(preg_replace('/\s+/u', ' ', strip_tags(\App\Support\RichText::render($post->body)))), 200) : $post->excerpt)
+@section('description', mb_strlen($post->excerpt) < 110 ? $post->excerpt.' — '.\Illuminate\Support\Str::limit(\App\Support\RichText::plain($post->body), 200) : $post->excerpt)
 @section('og_image', $post->cover_url)
 
 @push('head')

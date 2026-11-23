@@ -96,6 +96,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/posts/{post}', [Admin\PostController::class, 'update']);
             Route::delete('/posts/{post}', [Admin\PostController::class, 'destroy']);
             Route::post('/posts/{post}/images', [Admin\PostController::class, 'addImages']);
+            Route::post('/editor-images', [Admin\PostController::class, 'editorImage']);
             Route::patch('/post-images/{image}', [Admin\PostController::class, 'updateImage']);
             Route::delete('/post-images/{image}', [Admin\PostController::class, 'destroyImage']);
 
